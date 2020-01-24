@@ -18,7 +18,8 @@ package org.springframework.cloud.etcd.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.concurrent.TimeUnit;
+import javax.annotation.PostConstruct;
+import java.util.Objects;
 
 /**
  * @author Luca Burgazzoli
@@ -26,94 +27,127 @@ import java.util.concurrent.TimeUnit;
  */
 @ConfigurationProperties("spring.cloud.etcd.config")
 public class EtcdConfigProperties {
-	private boolean enabled = true;
-	private String prefix = "config";
-	private String defaultContext = "application";
-	private String profileSeparator = "-";
-	private int timeout = 1;
-	private TimeUnit timeoutUnit = TimeUnit.SECONDS;
+    private boolean enabled = true;
+    private String prefix = "config";
+    private String defaultContext = "application";
+    private String profileSeparator = "-";
+    private String name;
+    private int timeout = 1;
+    private Format format = Format.KEY_VALUE;
 
-	public EtcdConfigProperties() {
-	}
+    /*
+     * Throw exceptions during config lookup if true, otherwise, log warnings.
+     * */
+    private boolean failFast = true;
 
-	public boolean isEnabled() {
-		return enabled;
-	}
+    public EtcdConfigProperties() {
+    }
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
+    @PostConstruct
+    public void init() {
+        if (this.format == Format.FILES) {
+            this.profileSeparator = "-";
+        }
+    }
 
-	public String getPrefix() {
-		return prefix;
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getDefaultContext() {
-		return defaultContext;
-	}
+    public boolean isFailFast() {
+        return this.failFast;
+    }
 
-	public void setDefaultContext(String defaultContext) {
-		this.defaultContext = defaultContext;
-	}
+    public void setFailFast(boolean failFast) {
+        this.failFast = failFast;
+    }
 
-	public String getProfileSeparator() {
-		return profileSeparator;
-	}
+    public Format getFormat() {
+        return this.format;
+    }
 
-	public void setProfileSeparator(String profileSeparator) {
-		this.profileSeparator = profileSeparator;
-	}
+    public void setFormat(Format format) {
+        this.format = format;
+    }
 
-	public int getTimeout() {
-		return timeout;
-	}
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
-	}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-	public TimeUnit getTimeoutUnit() {
-		return timeoutUnit;
-	}
+    public String getPrefix() {
+        return prefix;
+    }
 
-	public void setTimeoutUnit(TimeUnit timeoutUnit) {
-		this.timeoutUnit = timeoutUnit;
-	}
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+    public String getDefaultContext() {
+        return defaultContext;
+    }
 
-		EtcdConfigProperties that = (EtcdConfigProperties) o;
+    public void setDefaultContext(String defaultContext) {
+        this.defaultContext = defaultContext;
+    }
 
-		if (enabled != that.enabled) return false;
-		if (timeout != that.timeout) return false;
-		if (prefix != null ? !prefix.equals(that.prefix) : that.prefix != null) return false;
-		if (defaultContext != null ? !defaultContext.equals(that.defaultContext) : that.defaultContext != null)
-			return false;
-		if (profileSeparator != null ? !profileSeparator.equals(that.profileSeparator) : that.profileSeparator != null)
-			return false;
-		return timeoutUnit == that.timeoutUnit;
-	}
+    public String getProfileSeparator() {
+        return profileSeparator;
+    }
 
-	@Override
-	public int hashCode() {
-		int result = (enabled ? 1 : 0);
-		result = 31 * result + (prefix != null ? prefix.hashCode() : 0);
-		result = 31 * result + (defaultContext != null ? defaultContext.hashCode() : 0);
-		result = 31 * result + (profileSeparator != null ? profileSeparator.hashCode() : 0);
-		result = 31 * result + timeout;
-		result = 31 * result + (timeoutUnit != null ? timeoutUnit.hashCode() : 0);
-		return result;
-	}
+    public void setProfileSeparator(String profileSeparator) {
+        this.profileSeparator = profileSeparator;
+    }
 
-	@Override
-	public String toString() {
-		return String.format("EtcdConfigProperties{enabled=%s, prefix='%s', defaultContext='%s', profileSeparator='%s', timeout=%d, timeoutUnit=%s}", enabled, prefix, defaultContext, profileSeparator, timeout, timeoutUnit);
-	}
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EtcdConfigProperties that = (EtcdConfigProperties) o;
+
+        if (enabled != that.enabled) return false;
+        if (timeout != that.timeout) return false;
+        if (!Objects.equals(prefix, that.prefix)) return false;
+        if (!Objects.equals(defaultContext, that.defaultContext))
+            return false;
+        return Objects.equals(profileSeparator, that.profileSeparator);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (enabled ? 1 : 0);
+        result = 31 * result + (prefix != null ? prefix.hashCode() : 0);
+        result = 31 * result + (defaultContext != null ? defaultContext.hashCode() : 0);
+        result = 31 * result + (profileSeparator != null ? profileSeparator.hashCode() : 0);
+        result = 31 * result + timeout;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("EtcdConfigProperties{enabled=%s, prefix='%s', defaultContext='%s', profileSeparator='%s', timeout=%d}", enabled, prefix, defaultContext, profileSeparator, timeout);
+    }
+
+    public enum Format {
+        KEY_VALUE,
+        PROPERTIES,
+        YAML,
+        FILES,
+    }
 }

@@ -21,6 +21,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,23 +30,23 @@ import java.util.List;
 @ConfigurationProperties("spring.cloud.etcd")
 public class EtcdProperties {
 	@NotNull
-	private List<URI> uris = Arrays.asList(URI.create("http://localhost:4001"));
+	private String uris = "http://localhost:2379";
 
 	private boolean enabled = true;
 
 	public EtcdProperties() {
 	}
 
-	public EtcdProperties(List<URI> uris, boolean enabled) {
+	public EtcdProperties(String uris, boolean enabled) {
 		this.uris = uris;
 		this.enabled = enabled;
 	}
 
-	public List<URI> getUris() {
+	public String getUris() {
 		return uris;
 	}
 
-	public void setUris(List<URI> uris) {
+	public void setUris(String uris) {
 		this.uris = uris;
 	}
 

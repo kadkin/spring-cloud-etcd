@@ -16,10 +16,7 @@
 
 package org.springframework.cloud.etcd;
 
-import java.net.URI;
-
-import mousio.etcd4j.EtcdClient;
-
+import io.etcd.jetcd.Client;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,29 +29,25 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties
 public class EtcdAutoConfiguration {
 
-	@Bean
-	@ConditionalOnMissingBean
-	public EtcdClient etcdClient() {
-		// TODO: support ssl
-		// TODO: support authentication
-		return new EtcdClient(etcdProperties().getUris().toArray(new URI[] {}));
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public Client etcdClient() {
+        // TODO: support ssl
+        // TODO: support authentication
+        return Client.builder()
+                .endpoints(etcdProperties().getUris())
+                .build();
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	public EtcdProperties etcdProperties() {
-		return new EtcdProperties();
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public EtcdProperties etcdProperties() {
+        return new EtcdProperties();
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	public EtcdEndpoint etcdEndpoint() {
-		return new EtcdEndpoint(etcdClient());
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	public EtcdHealthIndicator etcdHealthIndicator(EtcdClient client) {
-		return new EtcdHealthIndicator(client);
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public EtcdHealthIndicator etcdHealthIndicator(Client client) {
+        return new EtcdHealthIndicator(client);
+    }
 }

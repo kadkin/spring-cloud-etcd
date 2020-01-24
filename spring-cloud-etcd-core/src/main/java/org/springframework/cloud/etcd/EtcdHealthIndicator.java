@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.etcd;
 
-import mousio.etcd4j.EtcdClient;
+import io.etcd.jetcd.Client;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 
@@ -25,44 +25,44 @@ import org.springframework.boot.actuate.health.Health;
  */
 public class EtcdHealthIndicator extends AbstractHealthIndicator {
 
-	private final EtcdClient client;
+    private final Client client;
 
-	public EtcdHealthIndicator(EtcdClient client) {
-		this.client = client;
-	}
+    public EtcdHealthIndicator(Client client) {
+        this.client = client;
+    }
 
-	@Override
-	protected void doHealthCheck(Health.Builder builder) throws Exception {
-		try {
-			String version = client.getVersion();
-			builder.withDetail("version", version).up();
-		}
-		catch (Exception e) {
-			builder.down(e);
-		}
-	}
+    @Override
+    protected void doHealthCheck(Health.Builder builder) throws Exception {
+        try {
+            //CompletableFuture<AlarmResponse> alarmResponseCompletableFuture = client.getMaintenanceClient().listAlarms();
+            // TODO: support Health
+            builder.withDetail("version", "3.0").up();
+        } catch (Exception e) {
+            builder.down(e);
+        }
+    }
 
-	public EtcdClient getClient() {
-		return client;
-	}
+    public Client getClient() {
+        return client;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-		EtcdHealthIndicator that = (EtcdHealthIndicator) o;
+        EtcdHealthIndicator that = (EtcdHealthIndicator) o;
 
-		return client.equals(that.client);
-	}
+        return client.equals(that.client);
+    }
 
-	@Override
-	public int hashCode() {
-		return client.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return client.hashCode();
+    }
 
-	@Override
-	public String toString() {
-		return String.format("EtcdHealthIndicator{client=%s}", client);
-	}
+    @Override
+    public String toString() {
+        return String.format("EtcdHealthIndicator{client=%s}", client);
+    }
 }

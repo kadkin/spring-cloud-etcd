@@ -16,65 +16,52 @@
 
 package org.springframework.cloud.etcd.sample;
 
+import io.etcd.jetcd.Client;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.PropertySource;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Spencer Gibb
  */
 @SpringBootApplication
-@EnableDiscoveryClient
 @RestController
 public class SampleEtcdApplication {
 
-	public static final String CLIENT_NAME = "testEtcdApp";
+    public static final String CLIENT_NAME = "testEtcdApp";
 
-	@Autowired
-	private LoadBalancerClient loadBalancer;
+    @Value("${testproperty}")
+    String s;
 
-	@Autowired
-	private DiscoveryClient discoveryClient;
+    @Autowired
+    Environment env;
 
-	@Autowired
-	private Environment env;
+    @GetMapping("/myenv")
+    public Map<String, Object> env() {
+        Map<String, Object> map = new HashMap();
+        PropertySource<?> etcd = ((AbstractEnvironment) env).getPropertySources().get("etcd");
+        for (PropertySource<?> propertySource : ((AbstractEnvironment) env).getPropertySources()) {
+            if (propertySource instanceof MapPropertySource) {
+                map.putAll(((MapPropertySource) propertySource).getSource());
+            }
+        }
+        return null;
+    }
 
-	@Autowired(required = false)
-	private RelaxedPropertyResolver resolver;
-
-	@RequestMapping("/me")
-	public ServiceInstance me() {
-		return discoveryClient.getLocalServiceInstance();
-	}
-
-	@RequestMapping("/")
-	public ServiceInstance lb() {
-		return loadBalancer.choose(CLIENT_NAME);
-	}
-
-	@RequestMapping("/myenv")
-	public String env(@RequestParam("prop") String prop) {
-		String property = new RelaxedPropertyResolver(env).getProperty(prop, "Not Found");
-		return property;
-	}
-
-	@RequestMapping("/all")
-	public List<ServiceInstance> all() {
-		return discoveryClient.getInstances(CLIENT_NAME);
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(SampleEtcdApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SampleEtcdApplication.class, args);
+    }
 }
