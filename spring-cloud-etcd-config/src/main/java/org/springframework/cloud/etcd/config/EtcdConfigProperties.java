@@ -33,7 +33,7 @@ public class EtcdConfigProperties {
     private String profileSeparator = "-";
     private String name;
     private int timeout = 1;
-    private Format format = Format.KEY_VALUE;
+    private Format format = Format.YAML;
 
     /*
      * Throw exceptions during config lookup if true, otherwise, log warnings.

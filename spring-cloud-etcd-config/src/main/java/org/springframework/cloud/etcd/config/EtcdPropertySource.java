@@ -25,14 +25,22 @@ import io.etcd.jetcd.kv.GetResponse;
 import io.etcd.jetcd.options.GetOption;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.springframework.cloud.etcd.config.EtcdConfigProperties.Format.PROPERTIES;
+import static org.springframework.cloud.etcd.config.EtcdConfigProperties.Format.YAML;
 
 /**
  * @author Luca Burgazzoli
@@ -45,6 +53,7 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
     private final Map<String, Object> properties;
     private final EtcdConfigProperties config;
     private String context;
+    private final Charset charset = UTF_8;
 
     public EtcdPropertySource(String context, Client source, EtcdConfigProperties config) {
         super(context, source);
@@ -59,7 +68,7 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
         try {
             GetResponse getResponse = getSource()
                     .getKVClient()
-                    .get(ByteSequence.from(context, UTF_8), GetOption.newBuilder().build())
+                    .get(ByteSequence.from(context, charset), GetOption.newBuilder().build())
                     .get();
             List<KeyValue> values = getResponse.getKvs();
 
@@ -69,12 +78,9 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
                     parsePropertiesInKeyValueFormat(values);
                     break;
                 case PROPERTIES:
-                    break;
                 case YAML:
+                    parsePropertiesWithNonKeyValueFormat(values, format);
                     break;
-                case FILES:
-                    break;
-
             }
         } catch (EtcdException e) {
             if (e.getErrorCode() == ErrorCode.NOT_FOUND) {//key not found, no need to print stack trace
@@ -98,6 +104,10 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
         return properties.get(name);
     }
 
+    protected String getContext() {
+        return this.context;
+    }
+
     /**
      * Parses the properties in key value style i.e., values are expected to be either a
      * sub key or a constant.
@@ -110,12 +120,63 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
         }
 
         for (KeyValue getValue : values) {
-            String key = getValue.getKey().toString(UTF_8);
+            String key = getValue.getKey().toString(charset);
             if (!StringUtils.endsWithIgnoreCase(key, "/")) {
                 key = key.replace(this.context, "").replace('/', '.');
-                String value = getValue.getValue().toString(UTF_8);
-                this.properties.put("testproperty", value);
+                String value = getValue.getValue().toString(charset);
+                this.properties.put(key, value);
             }
         }
+    }
+
+    protected void parsePropertiesWithNonKeyValueFormat(List<KeyValue> values,
+                                                        EtcdConfigProperties.Format format) {
+        if (values == null) {
+            return;
+        }
+
+        for (KeyValue getValue : values) {
+            parseValue(getValue, format);
+        }
+    }
+
+    protected void parseValue(KeyValue getValue,
+                              EtcdConfigProperties.Format format) {
+        String value = getValue.getValue().toString(charset);
+        if (value == null) {
+            return;
+        }
+
+        Properties props = generateProperties(value, format);
+
+        for (Map.Entry entry : props.entrySet()) {
+            this.properties.put(entry.getKey().toString(), entry.getValue());
+        }
+    }
+
+    protected Properties generateProperties(String value,
+                                            EtcdConfigProperties.Format format) {
+        final Properties props = new Properties();
+
+        if (format == PROPERTIES) {
+            try {
+                // Must use the ISO-8859-1 encoding because Properties.load(stream)
+                // expects it.
+                props.load(new ByteArrayInputStream(value.getBytes("ISO-8859-1")));
+            } catch (IOException e) {
+                throw new IllegalArgumentException(
+                        value + " can't be encoded using ISO-8859-1");
+            }
+
+            return props;
+        } else if (format == YAML) {
+            final YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
+            yaml.setResources(
+                    new ByteArrayResource(value.getBytes(charset)));
+
+            return yaml.getObject();
+        }
+
+        return props;
     }
 }

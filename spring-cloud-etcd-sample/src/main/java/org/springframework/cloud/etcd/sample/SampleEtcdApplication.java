@@ -26,13 +26,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Spencer Gibb
@@ -48,9 +46,11 @@ public class SampleEtcdApplication {
 
     @Autowired
     Environment env;
+    @Autowired
+    Client client;
 
     @GetMapping("/myenv")
-    public Map<String, Object> env() {
+    public Map<String, Object> env() throws ExecutionException, InterruptedException {
         Map<String, Object> map = new HashMap();
         PropertySource<?> etcd = ((AbstractEnvironment) env).getPropertySources().get("etcd");
         for (PropertySource<?> propertySource : ((AbstractEnvironment) env).getPropertySources()) {

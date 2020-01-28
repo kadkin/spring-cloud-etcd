@@ -17,6 +17,10 @@
 package org.springframework.cloud.etcd.config;
 
 import io.etcd.jetcd.Client;
+import io.etcd.jetcd.KeyValue;
+
+import static org.springframework.cloud.etcd.config.EtcdConfigProperties.Format.PROPERTIES;
+import static org.springframework.cloud.etcd.config.EtcdConfigProperties.Format.YAML;
 
 /**
  * @author Luca Burgazzoli
@@ -28,4 +32,21 @@ public class EtcdFilesPropertySource extends EtcdPropertySource {
     public EtcdFilesPropertySource(String root, Client source, EtcdConfigProperties config) {
         super(root, source, config);
     }
+
+    @Override
+    public void init() {
+        // noop
+    }
+
+    public void init(KeyValue value) {
+        if (getContext().endsWith(".yml") || this.getContext().endsWith(".yaml")) {
+            parseValue(value, YAML);
+        } else if (this.getContext().endsWith(".properties")) {
+            parseValue(value, PROPERTIES);
+        } else {
+            throw new IllegalStateException(
+                    "Unknown files extension for context " + this.getContext());
+        }
+    }
+
 }

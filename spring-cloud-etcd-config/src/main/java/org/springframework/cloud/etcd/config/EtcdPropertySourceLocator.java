@@ -48,6 +48,7 @@ public class EtcdPropertySourceLocator implements PropertySourceLocator {
     private final Client etcd;
     private final EtcdConfigProperties properties;
     private static final Log log = LogFactory.getLog(EtcdPropertySourceLocator.class);
+    private final List<String> contexts = new ArrayList<>();
 
     public EtcdPropertySourceLocator(Client etcd, EtcdConfigProperties properties) {
         this.etcd = etcd;
@@ -56,16 +57,19 @@ public class EtcdPropertySourceLocator implements PropertySourceLocator {
 
     @Override
     public PropertySource<?> locate(Environment environment) {
+
         if (environment instanceof ConfigurableEnvironment) {
             final ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
+
             String appName = this.properties.getName();
+
             if (appName == null) {
                 appName = env.getProperty(EtcdConstants.PROPERTY_SPRING_APPLICATION_NAME);
             }
+
             List<String> profiles = Arrays.asList(env.getActiveProfiles());
+
             String prefix = this.properties.getPrefix();
-            String defaultContext = getContext(prefix,
-                    this.properties.getDefaultContext());
 
             List<String> suffixes = new ArrayList<>();
             if (this.properties.getFormat() != EtcdConfigProperties.Format.FILES) {
@@ -76,7 +80,7 @@ public class EtcdPropertySourceLocator implements PropertySourceLocator {
                 suffixes.add(".properties");
             }
 
-            final List<String> contexts = new ArrayList<>();
+            String defaultContext = getContext(prefix, this.properties.getDefaultContext());
 
             for (String suffix : suffixes) {
                 contexts.add(defaultContext + suffix);

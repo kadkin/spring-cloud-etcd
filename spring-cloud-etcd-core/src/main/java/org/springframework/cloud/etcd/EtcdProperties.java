@@ -23,12 +23,16 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * @author Spencer Gibb
+ * @author igor.kadkin
  */
 @ConfigurationProperties("spring.cloud.etcd")
 public class EtcdProperties {
+	/**
+	 *
+	 */
 	@NotNull
 	private String uris = "http://localhost:2379";
 
@@ -66,7 +70,7 @@ public class EtcdProperties {
 		EtcdProperties that = (EtcdProperties) o;
 
 		if (enabled != that.enabled) return false;
-		return uris != null ? uris.equals(that.uris) : that.uris == null;
+		return Objects.equals(uris, that.uris);
 	}
 
 	@Override

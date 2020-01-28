@@ -1,7 +1,15 @@
 spring:
   application:
     name: application
-#spring:
-#  cloud:
-#    etcd:
-#      config:
+  cloud:
+    etcd:
+      uris: http://localhost:2379
+      enabled: true
+      config:
+        enabled: true
+        prefix: configs/apps/etcdconfigs
+        default-context: etcdconfigs
+        name: spring-cloud-etcd-sample
+        fail-fast: true
+        format: yaml
+        profile-separator: "/"
