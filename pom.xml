@@ -19,7 +19,6 @@
     </parent>
 
     <modules>
-        <module>mediascope-cloud-etcd-dependencies</module>
         <module>mediascope-cloud-etcd-core</module>
         <module>mediascope-cloud-etcd-config</module>
         <module>mediascope-cloud-etcd-sample</module>
@@ -34,6 +33,7 @@
         <env.MAVEN_REPO_URL>https://artifactory.mediascope.net:443/artifactory/midas</env.MAVEN_REPO_URL>
         <env.MAVEN_REPO_URL_NAME>mediascope-cloud-etcd</env.MAVEN_REPO_URL_NAME>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -43,24 +43,17 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>net.mediascope.cloud</groupId>
-                <artifactId>mediascope-cloud-etcd-dependencies</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
     <distributionManagement>
         <repository>
-            <id>artifactory.mediascope.net</id>
-            <name>artifactory.mediascope.net</name>
+            <id>repo.spring.io</id>
+            <name>Spring Release Repository</name>
             <url>https://artifactory.mediascope.net/artifactory/midas/mediascope-cloud-etcd</url>
         </repository>
         <snapshotRepository>
-            <id>artifactory.mediascope.net</id>
-            <name>artifactory.mediascope.net</name>
+            <id>repo.spring.io</id>
+            <name>Spring Snapshot Repository</name>
             <url>https://artifactory.mediascope.net/artifactory/midas/mediascope-cloud-etcd</url>
         </snapshotRepository>
     </distributionManagement>
