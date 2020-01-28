@@ -29,13 +29,13 @@ test:
   script:
     - mvn -version
     - mvn $MAVEN_CLI_OPTS test
-#
-#release:
-#  tags:
-#    - release
-#  stage: release
-#  script:
-#    - mvn -version
-#    - mvn $MAVEN_CLI_OPTS deploy -P prod,!dev
-#  only:
-#    - master
+
+release:
+  tags:
+    - release
+  stage: release
+  script:
+    - mvn -version
+    - mvn $MAVEN_CLI_OPTS deploy
+  only:
+    - master
