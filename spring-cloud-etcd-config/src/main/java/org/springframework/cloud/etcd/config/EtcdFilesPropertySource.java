@@ -25,6 +25,7 @@ import static org.springframework.cloud.etcd.config.EtcdConfigProperties.Format.
 /**
  * @author Luca Burgazzoli
  * @author Spencer Gibb
+ * @author Igor Kadkin
  */
 public class EtcdFilesPropertySource extends EtcdPropertySource {
 
@@ -34,19 +35,15 @@ public class EtcdFilesPropertySource extends EtcdPropertySource {
     }
 
     @Override
-    public void init() {
-        // noop
-    }
-
-    public void init(KeyValue value) {
+    protected void parseValue(KeyValue getValue, EtcdConfigProperties.Format format) {
         if (getContext().endsWith(".yml") || this.getContext().endsWith(".yaml")) {
-            parseValue(value, YAML);
+            parseValue(getValue, YAML);
         } else if (this.getContext().endsWith(".properties")) {
-            parseValue(value, PROPERTIES);
+            parseValue(getValue, PROPERTIES);
         } else {
             throw new IllegalStateException(
                     "Unknown files extension for context " + this.getContext());
         }
-    }
 
+    }
 }

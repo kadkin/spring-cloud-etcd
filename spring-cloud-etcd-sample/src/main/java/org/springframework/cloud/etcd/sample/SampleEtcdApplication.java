@@ -41,16 +41,20 @@ public class SampleEtcdApplication {
 
     public static final String CLIENT_NAME = "testEtcdApp";
 
-    @Value("${testproperty}")
-    String s;
+    @Autowired
+    Config config;
 
     @Autowired
     Environment env;
     @Autowired
     Client client;
 
+    public static void main(String[] args) {
+        SpringApplication.run(SampleEtcdApplication.class, args);
+    }
+
     @GetMapping("/myenv")
-    public Map<String, Object> env() throws ExecutionException, InterruptedException {
+    public Map<String, Object> env(@Value("${testproperty}")String config1) throws ExecutionException, InterruptedException {
         Map<String, Object> map = new HashMap();
         PropertySource<?> etcd = ((AbstractEnvironment) env).getPropertySources().get("etcd");
         for (PropertySource<?> propertySource : ((AbstractEnvironment) env).getPropertySources()) {
@@ -59,9 +63,5 @@ public class SampleEtcdApplication {
             }
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(SampleEtcdApplication.class, args);
     }
 }

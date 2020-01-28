@@ -45,6 +45,7 @@ import static org.springframework.cloud.etcd.config.EtcdConfigProperties.Format.
 /**
  * @author Luca Burgazzoli
  * @author Spencer Gibb
+ * @author Igor Kadkin
  */
 public class EtcdPropertySource extends EnumerablePropertySource<Client> {
 
@@ -52,8 +53,8 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
 
     private final Map<String, Object> properties;
     private final EtcdConfigProperties config;
-    private String context;
     private final Charset charset = UTF_8;
+    private String context;
 
     public EtcdPropertySource(String context, Client source, EtcdConfigProperties config) {
         super(context, source);
@@ -63,6 +64,7 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
                 + EtcdConstants.PATH_SEPARATOR : EtcdConstants.PATH_SEPARATOR + context;
         this.config = config;
     }
+
 
     public void init() {
         try {
@@ -106,6 +108,14 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
 
     protected String getContext() {
         return this.context;
+    }
+
+    protected EtcdConfigProperties.Format getFormat() {
+        return config.getFormat();
+    }
+
+    protected Charset getCharset() {
+        return charset;
     }
 
     /**

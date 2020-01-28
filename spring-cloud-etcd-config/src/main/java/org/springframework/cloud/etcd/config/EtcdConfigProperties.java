@@ -17,9 +17,9 @@
 package org.springframework.cloud.etcd.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.style.ToStringCreator;
 
 import javax.annotation.PostConstruct;
-import java.util.Objects;
 
 /**
  * @author Luca Burgazzoli
@@ -34,7 +34,7 @@ public class EtcdConfigProperties {
     private String name;
     private int timeout = 1;
     private Format format = Format.YAML;
-
+    private Watch watch = new Watch();
     /*
      * Throw exceptions during config lookup if true, otherwise, log warnings.
      * */
@@ -114,34 +114,26 @@ public class EtcdConfigProperties {
         this.timeout = timeout;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        EtcdConfigProperties that = (EtcdConfigProperties) o;
-
-        if (enabled != that.enabled) return false;
-        if (timeout != that.timeout) return false;
-        if (!Objects.equals(prefix, that.prefix)) return false;
-        if (!Objects.equals(defaultContext, that.defaultContext))
-            return false;
-        return Objects.equals(profileSeparator, that.profileSeparator);
+    public Watch getWatch() {
+        return this.watch;
     }
 
-    @Override
-    public int hashCode() {
-        int result = (enabled ? 1 : 0);
-        result = 31 * result + (prefix != null ? prefix.hashCode() : 0);
-        result = 31 * result + (defaultContext != null ? defaultContext.hashCode() : 0);
-        result = 31 * result + (profileSeparator != null ? profileSeparator.hashCode() : 0);
-        result = 31 * result + timeout;
-        return result;
+    public void setWatch(Watch watch) {
+        this.watch = watch;
     }
 
     @Override
     public String toString() {
-        return String.format("EtcdConfigProperties{enabled=%s, prefix='%s', defaultContext='%s', profileSeparator='%s', timeout=%d}", enabled, prefix, defaultContext, profileSeparator, timeout);
+        return new ToStringCreator(this)
+                .append("enabled", this.enabled)
+                .append("prefix", this.prefix)
+                .append("defaultContext", this.defaultContext)
+                .append("name", this.name)
+                .append("profileSeparator", this.profileSeparator)
+                .append("format", this.format)
+                .append("timeout", this.timeout)
+                .append("watch", this.watch)
+                .toString();
     }
 
     public enum Format {
@@ -149,5 +141,60 @@ public class EtcdConfigProperties {
         PROPERTIES,
         YAML,
         FILES,
+    }
+
+    /**
+     * etcd watch properties.
+     */
+    public static class Watch {
+
+        private int waitTime = 55;
+
+        /**
+         * If the watch is enabled. Defaults to true.
+         */
+        private boolean enabled = true;
+
+        /**
+         * The value of the fixed delay for the watch in millis. Defaults to 1000.
+         */
+        private int delay = 1000;
+
+        public Watch() {
+        }
+
+        public int getWaitTime() {
+            return this.waitTime;
+        }
+
+        public void setWaitTime(int waitTime) {
+            this.waitTime = waitTime;
+        }
+
+        public boolean isEnabled() {
+            return this.enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public int getDelay() {
+            return this.delay;
+        }
+
+        public void setDelay(int delay) {
+            this.delay = delay;
+        }
+
+        @Override
+        public String toString() {
+            return new ToStringCreator(this)
+                    .append("waitTime", this.waitTime)
+                    .append("enabled", this.enabled)
+                    .append("delay", this.delay)
+                    .toString();
+        }
+
     }
 }

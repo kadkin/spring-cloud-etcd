@@ -18,8 +18,8 @@ package org.springframework.cloud.etcd.config;
 
 import io.etcd.jetcd.Client;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.etcd.ConditionalOnEtcdEnabled;
 import org.springframework.cloud.etcd.EtcdAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,19 +31,20 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import(EtcdAutoConfiguration.class)
 @EnableConfigurationProperties
-@ConditionalOnProperty(name = "spring.cloud.etcd.enabled", matchIfMissing = true)
+@ConditionalOnEtcdEnabled
+//@ConditionalOnProperty(name = "spring.cloud.etcd.enabled", matchIfMissing = true)
 public class EtcdConfigBootstrapConfiguration {
 
-	@Autowired
-	private Client etcd;
+    @Autowired
+    private Client etcd;
 
-	@Bean
-	public EtcdConfigProperties etcdConfigProperties() {
-		return new EtcdConfigProperties();
-	}
+    @Bean
+    public EtcdConfigProperties etcdConfigProperties() {
+        return new EtcdConfigProperties();
+    }
 
-	@Bean
-	public EtcdPropertySourceLocator etcdPropertySourceLocator() {
-		return new EtcdPropertySourceLocator(etcd, etcdConfigProperties());
-	}
+    @Bean
+    public EtcdPropertySourceLocator etcdPropertySourceLocator() {
+        return new EtcdPropertySourceLocator(etcd, etcdConfigProperties());
+    }
 }
