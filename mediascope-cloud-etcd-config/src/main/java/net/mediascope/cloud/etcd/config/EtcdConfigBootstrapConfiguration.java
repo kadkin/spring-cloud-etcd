@@ -17,10 +17,10 @@
 package net.mediascope.cloud.etcd.config;
 
 import io.etcd.jetcd.Client;
+import net.mediascope.cloud.etcd.ConditionalOnEtcdEnabled;
+import net.mediascope.cloud.etcd.EtcdAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.etcd.ConditionalOnEtcdEnabled;
-import org.springframework.cloud.etcd.EtcdAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
