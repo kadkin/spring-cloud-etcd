@@ -20,7 +20,7 @@ build:
   stage: build
   script:
     - mvn -version
-    - mvn $MAVEN_CLI_OPTS compile -P prod,!dev
+    - mvn $MAVEN_CLI_OPTS compile
 
 test:
   tags:
