@@ -4,18 +4,18 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.cloud</groupId>
-		<artifactId>spring-cloud-etcd</artifactId>
-		<version>1.0.0.BUILD-SNAPSHOT</version>
+		<groupId>net.mediascope.cloud</groupId>
+		<artifactId>mediascope-cloud-etcd</artifactId>
+		<version>1.0.0</version>
 		<relativePath>..</relativePath>
 	</parent>
-	<artifactId>spring-cloud-etcd-docs</artifactId>
+	<artifactId>mediascope-cloud-etcd-docs</artifactId>
 	<packaging>pom</packaging>
-	<name>Spring Cloud Etcd Docs</name>
-	<description>Spring Cloud Docs</description>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
+	<name>Mediascope Cloud Etcd Docs</name>
+	<description>Mediascope Cloud Docs</description>
+	<version>1.0.0</version>
 	<properties>
-		<docs.main>spring-cloud-etcd</docs.main>
+		<docs.main>mediascope-cloud-etcd</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
 	</properties>
 	<build>
