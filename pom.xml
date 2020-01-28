@@ -30,8 +30,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <env.MAVEN_REPO_URL>https://artifactory.mediascope.net:443/artifactory/midas</env.MAVEN_REPO_URL>
-        <env.MAVEN_REPO_URL_NAME>mediascope-cloud-etcd</env.MAVEN_REPO_URL_NAME>
+        <env.ARTIFACTORY_URL>https://artifactory.mediascope.net:443/artifactory</env.ARTIFACTORY_URL>
+        <env.ARTIFACTORY_REPO>midas</env.ARTIFACTORY_REPO>
+        <env.ARTIFACTORY_PROJECT_NAME>mediascope-cloud-etcd</env.ARTIFACTORY_PROJECT_NAME>
     </properties>
 
     <dependencyManagement>
@@ -49,12 +50,12 @@
         <repository>
             <id>repo.spring.io</id>
             <name>Spring Release Repository</name>
-            <url>https://artifactory.mediascope.net/artifactory/midas/mediascope-cloud-etcd</url>
+            <url>${env.ARTIFACTORY_URL}/${env.ARTIFACTORY_REPO}/${env.ARTIFACTORY_PROJECT_NAME}</url>
         </repository>
         <snapshotRepository>
             <id>repo.spring.io</id>
             <name>Spring Snapshot Repository</name>
-            <url>https://artifactory.mediascope.net/artifactory/midas/mediascope-cloud-etcd</url>
+            <url>${env.ARTIFACTORY_URL}/${env.ARTIFACTORY_REPO}/${env.ARTIFACTORY_PROJECT_NAME}</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
