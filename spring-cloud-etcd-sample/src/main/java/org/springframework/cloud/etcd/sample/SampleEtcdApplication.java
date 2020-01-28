@@ -18,19 +18,14 @@ package org.springframework.cloud.etcd.sample;
 
 import io.etcd.jetcd.Client;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.MapPropertySource;
-import org.springframework.core.env.PropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Spencer Gibb
@@ -43,25 +38,26 @@ public class SampleEtcdApplication {
 
     @Autowired
     Config config;
-
+    @Autowired
+    ConfigNoRefresh configNoRefresh;
     @Autowired
     Environment env;
     @Autowired
     Client client;
+
+    public SampleEtcdApplication() {
+
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(SampleEtcdApplication.class, args);
     }
 
     @GetMapping("/myenv")
-    public Map<String, Object> env(@Value("${testproperty}")String config1) throws ExecutionException, InterruptedException {
+    public Map<String, Object> env() {
         Map<String, Object> map = new HashMap();
-        PropertySource<?> etcd = ((AbstractEnvironment) env).getPropertySources().get("etcd");
-        for (PropertySource<?> propertySource : ((AbstractEnvironment) env).getPropertySources()) {
-            if (propertySource instanceof MapPropertySource) {
-                map.putAll(((MapPropertySource) propertySource).getSource());
-            }
-        }
-        return null;
+        map.put("config", config.getProperty());
+        map.put("configNoRefresh", configNoRefresh.getProperty());
+        return map;
     }
 }
