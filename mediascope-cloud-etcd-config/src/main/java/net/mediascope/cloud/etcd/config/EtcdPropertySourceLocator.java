@@ -30,10 +30,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.ReflectionUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -49,10 +46,13 @@ public class EtcdPropertySourceLocator implements PropertySourceLocator {
     private final EtcdConfigProperties properties;
     private static final Log log = LogFactory.getLog(EtcdPropertySourceLocator.class);
     private final List<String> contexts = new ArrayList<>();
+    private Map<ByteSequence,Long> contextIndexes;
+
 
     public EtcdPropertySourceLocator(Client etcd, EtcdConfigProperties properties) {
         this.etcd = etcd;
         this.properties = properties;
+        this.contextIndexes=new LinkedHashMap<>();
     }
 
     @Override
@@ -118,6 +118,8 @@ public class EtcdPropertySourceLocator implements PropertySourceLocator {
                     } else {
                         propertySource = new EtcdPropertySource(propertySourceContext, etcd, properties);
                         propertySource.init();
+
+                        this.getContextIndexes().putAll(propertySource.getCreateModRevison());
                     }
                     if (propertySource != null) {
                         composite.addPropertySource(propertySource);
@@ -155,5 +157,9 @@ public class EtcdPropertySourceLocator implements PropertySourceLocator {
             contexts.add(baseContext + this.properties.getProfileSeparator() + profile
                     + suffix);
         }
+    }
+
+    public Map<ByteSequence, Long> getContextIndexes() {
+        return contextIndexes;
     }
 }

@@ -54,17 +54,22 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
     private final Map<String, Object> properties;
     private final EtcdConfigProperties config;
     private final Charset charset = UTF_8;
+    private final Map<ByteSequence, Long> createModRevison;
     private String context;
 
     public EtcdPropertySource(String context, Client source, EtcdConfigProperties config) {
         super(context, source);
         this.context = context;
         this.properties = new HashMap<>();
+        this.createModRevison = new HashMap<>();
         this.context = context.startsWith(EtcdConstants.PATH_SEPARATOR) ? context
                 + EtcdConstants.PATH_SEPARATOR : EtcdConstants.PATH_SEPARATOR + context;
         this.config = config;
     }
 
+    public Map<ByteSequence, Long> getCreateModRevison() {
+        return createModRevison;
+    }
 
     public void init() {
         try {
@@ -152,16 +157,21 @@ public class EtcdPropertySource extends EnumerablePropertySource<Client> {
 
     protected void parseValue(KeyValue getValue,
                               EtcdConfigProperties.Format format) {
+
+        long createRevision = getValue.getCreateRevision();
+        ByteSequence key = getValue.getKey();
+        long modRevision = getValue.getModRevision();
         String value = getValue.getValue().toString(charset);
         if (value == null) {
             return;
         }
 
         Properties props = generateProperties(value, format);
-
+        this.createModRevison.put(key, modRevision);
         for (Map.Entry entry : props.entrySet()) {
             this.properties.put(entry.getKey().toString(), entry.getValue());
         }
+
     }
 
     protected Properties generateProperties(String value,
