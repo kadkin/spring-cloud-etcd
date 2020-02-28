@@ -3,7 +3,7 @@ spring:
     name: application
   cloud:
     etcd:
-      uris: http://localhost:2379
+      uris: http://192.168.20.169:2379
       enabled: true
       config:
         enabled: true
@@ -13,3 +13,7 @@ spring:
         fail-fast: true
         format: yaml
         profile-separator: "/"
+        watch:
+          enabled: true
+
+logging.level.: DEBUG

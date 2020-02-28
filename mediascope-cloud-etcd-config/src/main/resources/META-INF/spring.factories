@@ -1,3 +1,6 @@
+# Auto Configuration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+net.mediascope.cloud.etcd.config.EtcdConfigAutoConfiguration
 # Bootstrap Configuration
 org.springframework.cloud.bootstrap.BootstrapConfiguration=\
 net.mediascope.cloud.etcd.config.EtcdConfigBootstrapConfiguration
